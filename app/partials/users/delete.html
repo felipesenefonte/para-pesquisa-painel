@@ -1,0 +1,18 @@
+				<form name="form" novalidate>
+					<div class="box">
+						<div class="title">
+							Editar usuário {{ user.name }}
+						</div>
+
+						<div class="content">
+							<div class="alert alert-success" ng-show="showMessage == 'success'">O usuário foi removido com sucesso.</div>
+
+							<div ng-hide="showMessage">
+								<p>Você tem certeza que deseja remover este usuário?</p>
+
+								<div class="submit_container">
+									<button ng-click="deleteUser()" type="submit" class="btn btn-primary">Enviar</button>
+								</div>
+							</div>
+					</div>
+				</form>

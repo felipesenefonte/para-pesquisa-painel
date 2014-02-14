@@ -1,0 +1,61 @@
+				<div class="box">
+					<div class="title">
+						Questionários
+
+						<a href="#/forms/create" class="btn btn-default btn-header"><span class="glyphicon glyphicon-plus"></span></a>
+
+						<div class="input-group search">
+							<input type="text" class="form-control" ng-model="q" placeholder="Procurar...">
+
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-search"></span>
+								</button>
+							</span>
+						</div>
+					</div>
+
+					<div class="content">
+						<table class="table custom table-striped table-hover">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Título</th>
+									<th>Criado em</th>
+									<th style="width: 35%"></th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr ng-repeat="form in forms | filter:q">
+									<td>{{ form.id }}</td>
+									<td>{{ form.name }}</td>
+									<td>{{ form.created_at | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+									<td>
+										<div class="btn-group">
+											<a href="#/forms/edit/{{ form.id }}" class="btn btn-info" rel="tooltip" title="Editar"><span class="glyphicon glyphicon-edit"></span></a>
+											<a href="#/forms/edit/{{ form.id }}/submissions" class="btn btn-info" rel="tooltip" title="Visualizar Pesquisas"><span class="glyphicon glyphicon-align-left"></span></a>
+											<a href="#/forms/edit/{{ form.id }}/statistics" class="btn btn-info" rel="tooltip" title="Ver estatísticas"><span class="glyphicon glyphicon-stats"></span></a>
+											<a href="#/forms/edit/{{ form.id }}/assignments" class="btn btn-info" rel="tooltip" title="Ver usuários"><span class="glyphicon glyphicon-user"></span></a>
+											<a data-toggle="modal" href="#deleteModal" ng-click="$parent.delete_id = form.id;" class="btn btn-info" rel="tooltip" title="Remover"><span class="glyphicon glyphicon-trash"></span></a>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<delete-modal id="deleteModal" callback="deleteForm()">Você tem certeza que deseja EXCLUIR este questionário? Ao excluir, todas as pesquisas deste questionário serão apagadas permanentemente e você não poderá mais ter acesso as estatísticas e pesquisas realizadas.</delete-modal>
+
+				<!--
+				<ul class="pagination custom">
+					<li class="disabled"><a href="#">&laquo;</a></li>
+					<li class="active"><a href="#">1</a></li>
+					<li><a href="#">2</a></li>
+					<li><a href="#">3</a></li>
+					<li><a href="#">4</a></li>
+					<li><a href="#">5</a></li>
+					<li><a href="#">&raquo;</a></li>
+				</ul>
+				-->

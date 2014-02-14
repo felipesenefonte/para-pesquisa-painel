@@ -1,0 +1,38 @@
+				<div class="box">
+					<div class="title">
+						Usuários no questionário
+					</div>
+
+					<div class="content">
+						<table class="table custom table-striped table-hover" infinite-scroll="fetchAssignments()" infinite-scroll-distance="2">
+							<thead>
+								<tr>
+									<th>Pesquisador</th>
+									<th></th>
+									<th>Coordenador</th>
+									<th></th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr ng-repeat="assignment in assignments">
+									<td>{{ assignment.user.name }}</td>
+									<td>
+										<a href="#/forms/edit/{{ form_id }}/users/{{ assignment.user.id }}/statistics" class="btn btn-info" rel="tooltip" title="Ver estatísticas do pesquisador no formulário"><span class="glyphicon glyphicon-stats"></span></a>
+										<a data-toggle="modal" href="#transferModal" ng-click="$parent.transfer_info = {id: assignment.user.id, name: assignment.user.name};" class="btn btn-info" rel="tooltip" title="Transferir pesquisas"><span class="glyphicon glyphicon-transfer"></span></a>
+									</td>
+									<td ng-hide="assignment.moderator == null">{{ assignment.moderator.name }}</td>
+									<td ng-hide="assignment.moderator == null">
+										<a href="#/forms/edit/{{ form_id }}/users/{{ assignment.moderator.id }}/statistics" class="btn btn-info" rel="tooltip" title="Ver estatísticas do coordenador no formulário"><span class="glyphicon glyphicon-stats"></span></a>
+										<a data-toggle="modal" href="#transferModal" ng-click="$parent.transfer_info = {id: assignment.moderator.id, name: assignment.moderator.name};" class="btn btn-info" rel="tooltip" title="Transferir pesquisas"><span class="glyphicon glyphicon-transfer"></span></a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+
+						<p class="scrolling_status" ng-show="waiting">Carregando novos usuários...</p>
+						<p class="scrolling_status" ng-show="end">Todos os usuários foram carregados.</p>
+					</div>
+				</div>
+
+				<transfer-modal id="transferModal" callback="transferSubmissions">Selecione o usuário na lista abaixo que irá receber as pesquisas de {{ transfer_info.name }}:</transfer-modal>

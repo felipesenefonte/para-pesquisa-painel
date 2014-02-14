@@ -1,0 +1,90 @@
+				<div class="box logs">
+					<div class="title">
+						Consulta de histórico (log do sistema)
+
+						<div class="btn-group pull-right">
+							<a href="" class="btn btn-default btn-header dropdown-toggle" data-toggle="dropdown">
+								Período <span class="caret"></span>
+							</a>
+
+							<ul class="dropdown-menu" role="menu">
+								<li ng-class="{active: period == 'today'}"><a href="" ng-click="applyDateFilter('today')">Hoje</a></li>
+								<li ng-class="{active: period == 'this_week'}"><a href="" ng-click="applyDateFilter('this_week')">Esta semana</a></li>
+								<li ng-class="{active: period == 'this_month'}"><a href="" ng-click="applyDateFilter('this_month')">Este mês</a></li>
+								<li ng-class="{active: period == 'this_year'}"><a href="" ng-click="applyDateFilter('this_year')">Este ano</a></li>
+								<li class="divider"></li>
+								<li ng-class="{active: period == null}"><a href="" ng-click="applyDateFilter(null)">Todos</a></li>
+							</ul>
+						</div>
+
+						<div class="btn-group pull-right">
+							<a class="btn btn-default btn-header by_user">
+								Por usuário <span class="caret"></span>
+							</a>
+						</div>
+
+						<!-- search popover -->
+						<div id="search_by_user_popover" style="display: none;">
+							<div class="form-group">
+								<input type="text" id="search_by_user" class="form-control" placeholder="Procurar pesquisador...">
+							</div>
+						</div>
+
+						<!--
+						<div class="input-group search">
+							<input type="text" class="form-control" ng-model="q" placeholder="Procurar...">
+
+							<span class="input-group-btn">
+								<button class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-search"></span>
+								</button>
+							</span>
+						</div>
+						-->
+					</div>
+
+					<div class="content">
+						<div class="timeline" infinite-scroll="fetchLogs()" infinite-scroll-distance="2">
+
+							<div class="results">
+								<span></span>
+
+								<p>{{ count }} resultados encontrados</p>
+							</div>
+
+							<div class="clearfix"></div>
+
+							<div class="item" ng-repeat="log in logs">
+								<div class="info">
+									<div class="date">
+										<h2>{{ log.when | date:'HH:mm' }}</h2>
+										<span>{{ log.when | date:'dd/MM/yy' }}</span>
+									</div>
+
+									<img user-avatar avatar="log.user.avatar" class="toggle_tooltip" data-toggle="tooltip" title="{{ log.user.name }}">
+								</div>
+
+								<div class="text">
+									<a href="#/forms/edit/{{ log.form.id }}/submissions/user/{{ log.user.id }}">{{ log.user.name }}</a> {{ log.action | logAction }} <span ng-hide="log.stop_reason == null">com o motivo {{ log.stop_reason.reason }}</span> <span ng-hide="log.submission_owner == null || log.action == 'started'">do usuário <a href="#/forms/edit/{{ log.form.id }}/submissions/user/{{ log.submission_owner.id }}">{{ log.submission_owner.name }}</a></span>
+								</div>
+							</div>
+
+							<div class="load" ng-show="waiting">
+								<div>
+									<span class="glyphicon glyphicon-arrow-down"></span>
+								</div>
+
+								<p>Carregando feed...</p>
+							</div>
+
+							<div class="load" ng-show="end">
+								<div>
+									<span class="glyphicon glyphicon-ok"></span>
+								</div>
+
+								<p>Todas as entradas foram carregadas.</p>
+							</div>
+
+						</div>
+					</div>
+				</div>

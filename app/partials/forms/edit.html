@@ -1,0 +1,630 @@
+			<div class="create_forms">
+				<div class="box">
+					<div class="paging">
+						<div class="all_steps">
+							<div class="step" ng-class="{disabled: current_page != 'page_one'}" ng-click="toPage('page_one')">
+								<span><div class="glyphicon glyphicon-cog"></div></span>
+
+								<p>Configuração do questionário</p>
+							</div>
+
+							<hr class="disabled" />
+
+							<div class="step" ng-class="{disabled: current_page != 'page_two'}" ng-click="toPage('page_two')">
+								<span><div class="glyphicon glyphicon-pencil"></div></span>
+
+								<p>Importar dados pré-definidos</p>
+							</div>
+
+							<hr class="disabled" />
+
+							<div class="step" ng-class="{disabled: current_page != 'page_three'}" ng-click="toPage('page_three')">
+								<span><div class="glyphicon glyphicon-user"></div></span>
+
+								<p>Adicionar usuários</p>
+							</div>
+
+							<hr class="disabled" />
+
+							<div class="step" ng-class="{disabled: current_page != 'page_four'}" ng-click="toPage('page_four')">
+								<span><div class="glyphicon glyphicon-ok"></div></span>
+
+								<p>Criar as perguntas</p>
+							</div>
+						</div>
+					</div>
+
+					<div class="content">
+						
+						<!-- Configuration -->
+						<div id="page_one" ng-show="current_page == 'page_one'">
+
+							<div class="row">
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label for="inputTitle">Título do formulário</label>
+										<input type="text" ng-model="form.name" class="form-control" id="inputTitle" placeholder="Escolha um nome" ng-blur="saveForm()" />
+									</div>
+
+									<div class="form-group">
+										<label for="inputEnd">Data de encerramento</label>
+
+										<div class="input-group">
+											<input type="text" ng-model="form.pub_end" class="form-control" ng-disabled="!end" id="inputEnd" ui-date="dateOptions" ui-date-format translate-ui-date />
+											<span class="input-group-addon">
+												<input type="checkbox" ng-model="end" />
+											</span>
+										</div>
+									</div>
+								
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" ng-model="form.allow_transfer" ng-blur="saveForm()"> Ativar "Transferência de pesquisas" no aplicativo
+										</label>
+									</div>
+								</div>
+
+								<div class="col-lg-6">
+									<div class="form-group">
+										<label for="inputPublishing">Data de publicação</label>
+										
+										<div class="input-group">
+											<input type="text" ng-model="form.pub_start" class="form-control" ng-disabled="!publishing" id="inputPublishing" ui-date="dateOptions" ui-date-format translate-ui-date />
+											<span class="input-group-addon">
+												<input type="checkbox" ng-model="publishing" />
+											</span>
+										</div>
+									</div>
+
+									<div class="form-group">
+										<label for="inputReasons">Motivos de reagendamento</label>
+										
+										<div class="clearfix"></div>
+										
+										<button class="btn btn-warning btn-block" id="inputReasons" ng-click="showAddReasons()">Cadastrar motivos</button>
+									</div>
+								</div>
+							</div>
+
+							<a class="btn btn-info pull-right" ng-click="nextPage()">Próximo</a>
+
+							<div class="clearfix"></div>
+
+							<!-- Show reasons modal -->
+							<div class="modal fade" id="reasons_modal" tabindex="-1" role="dialog" aria-hidden="true">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+											<h4 class="modal-title">Adicionar razões para reagendamento</span></h4>
+										</div>
+
+										<div class="modal-body">
+											<div ng-show="form.stop_reasons.length">
+												<ul class="list-group">
+													<li class="list-group-item" ng-repeat="reason in form.stop_reasons">
+														<span class="badge badge-danger" style="cursor: pointer" ng-click="deleteReason(reason)"><span class="glyphicon glyphicon-remove"></span></span>
+														{{ reason.reason }} <span class="label label-primary">{{ reason.reschedule | rescheduleText }}</span>
+													</li>
+												</ul>
+											</div>
+
+											<form ng-submit="addReason()">
+												<div class="input-group">
+													<input type="text" class="form-control" ng-model="reasonName" required>
+													<span class="input-group-btn">
+														<button class="btn btn-info" type="submit">Adicionar</button>
+													</span>
+												</div>
+
+												<p style="margin-top: 10px;">Ação ao selecionar motivo:</p>
+
+												<div class="checkbox">
+   													<label>
+														<input type="radio" ng-model="reasonReschedule" value="true" /> Reagendar
+													</label>
+												</div>
+													
+												<div class="checkbox">
+    												<label>
+														<input type="radio" ng-model="reasonReschedule" value="false" /> Cancelar
+													</label>
+												</div>
+											</form>
+										</div>
+
+										<div class="modal-footer">
+											<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div ng-show="current_page == 'page_two' && form.allow_new_submissions == true">
+							<div class="alert alert-info">Você não pode importar um arquivo CSV após iniciar novas pesquisas.</div>
+
+							<a class="btn btn-info" ng-click="prevPage()">Anterior</a>
+							<a class="btn btn-info pull-right" ng-click="nextPage()">Próximo</a>
+
+							<div class="clearfix"></div>
+						</div>
+
+						<!-- data wizard -->
+						<div id="page_two" ng-show="current_page == 'page_two' && (form.allow_new_submissions == false || form.allow_new_submissions == null)" class="import">
+							<p>Você pode importar um arquivo CSV contendo uma lista de informações já preenchidas que será utilizada como base para as pesquisas que serão preenchidas. Os dados podem ter informações extras para auxiliar seus pesquisadores, um título e também substituição de pesquisas automaticamente.</p>
+							
+							<p>Recomendamos que você leia o documento que explica como funciona, caso deseje utilizar este recurso em seu questionário.</p>
+							
+							<p><a class="btn btn-info btn-xs" data-toggle="modal" href="#csv_instructions">Leia aqui como funciona</a></p>
+
+							<div ng-show="showImportOptions == false">
+								<p class="big">Envie um arquivo</p>
+
+								<div class="send_file" ng-hide="importing">
+									<label for="send_csv" class="btn btn-primary">Enviar arquivo</label>
+									<input type="file" ng-file-select="sendFile($files)" accept=".csv" style="display:none;" id="send_csv" />
+								</div>
+
+								<div class="send_file" ng-show="importing">
+									Carregando...
+								</div>
+
+								<p class="big">ou</p>
+
+								<div class="go_next">
+									<a class="btn btn-info" ng-click="nextPage()">Continue com o processo</a>
+								</div>
+
+								<div class="go_back">
+									<a class="btn btn-info btn-xs" ng-click="prevPage()">Voltar</a>
+								</div>
+							</div>
+
+							<div ng-show="showImportOptions == true && showImportLog == false">
+								<div class="import_option">
+									<h1>1. Selecione o título de suas pesquisas (se houver)</h1>
+
+									<div class="content">
+										<p>Suas pesquisas podem ter o título da pesquisa. Quando o seu pesquisador clica em "Nova Pesquisa" ele deve selecionar qual dos itens, descrito pelo título, deverão acessar para iniciar a pesquisa.</p>
+										
+										<select ng-model="csv.current_identifier" class="form-control" ng-options="e as e for e in csv.headers">
+											<option value="">--</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="import_option">
+									<h1>2. Selecione o agrupamento de pesquisas (se houver)</h1>
+
+									<div class="content">
+										<p>O sistema permite que você possa substituir uma pesquisa por uma outra automaticamente. Para isso seu CSV deve agrupar um conjunto de pesquisas a um determinado agente pesquisador.</p>
+										
+										<select ng-model="csv.current_substitution" class="form-control" ng-options="e as e for e in csv.headers">
+											<option value="">--</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="import_option">
+									<h1>3. Vincular as pesquisas ao agente pesquisador (obrigatório)</h1>
+
+									<div class="content">
+										<p>Para que seus agentes pesquisadores recebam as pesquisas em seus usuários no aplicativo, você deve selecionar a coluna que atribui a pesquisa ao login do usuário.</p>
+										
+										<select ng-model="csv.current_grouping" class="form-control" ng-options="e as e for e in csv.headers">
+											<option value="">--</option>
+										</select>
+									</div>
+								</div>
+
+								<div class="clearfix"></div>
+
+								<a class="btn btn-info" ng-click="prevPage()">Anterior</a>
+								<a class="btn btn-info pull-right" ng-click="saveCsv()">Próximo</a>
+
+								<div class="clearfix"></div>
+							</div>
+
+							<div ng-show="showImportLog">
+								<div class="panel panel-danger" ng-hide="errors.length() == 0">
+									<div class="panel-heading">Erros na importação</div>
+									<div class="panel-body failed_imports">
+										
+										<ul>
+											<div ng-repeat="errors in failed_imports">
+												<li ng-repeat="error in errors">
+												Linha: {{ error.line }}: {{ error.error | csvMessages }}
+												</li>
+											</div>
+										</ul>
+
+									</div>
+								</div>
+
+								<div class="panel panel-success">
+									<div class="panel-heading">Importados com sucesso</div>
+									<div class="panel-body successful_imports">
+										<ul>
+											<div ng-repeat="successes in successful_imports">
+												<li ng-repeat="success in successes">
+												ID do usuário: {{ success.user_id }}
+												</li>
+											</div>
+										</ul>
+									</div>
+								</div>
+
+								<div class="clearfix"></div>
+
+								<a class="btn btn-info" ng-click="prevPage()">Anterior</a>
+								<a class="btn btn-info pull-right" ng-click="nextPage()">Próximo</a>
+
+								<div class="clearfix"></div>
+							</div>
+
+							<div class="clearfix"></div>
+						</div>
+
+						<div id="page_three" ng-show="current_page == 'page_three'" class="set_users">
+							<h1>Adicionar pesquisadores</h1>
+							<p>Adicione o seus pesquisadores a este questionário e atribua o número de pesquisas que eles poderão fazer.</p>
+
+							<div class="list_users">
+								<div class="form-group">
+									<label for="inputUsers">Vincular pesquisador</label>
+
+									<div>
+										<input type="text" class="form-control" id="inputUsers" placeholder="Escreva o nome do pesquisador" />
+									</div>
+								</div>
+							</div>
+
+							<div class="clearfix"></div>
+
+							<div ng-show="assignments" class="users_table">
+								<table class="table custom">
+									<thead>
+										<tr>
+											<td>#</td>
+											<td>Nome</td>
+											<td style="width: 30%">Quantidade de pesquisas</td>
+											<td style="width: 30%">Atribuir um coordenador ao pesquisador</td>
+											<td>Remover</td>
+										</tr>
+									</thead>
+
+									<tbody>
+										<tr ng-repeat="assignment in assignments" assignment-item>
+											<td><img user-avatar avatar="assignment.user.avatar" class="toggle_tooltip" data-toggle="tooltip" title="{{ assignment.user.name }}" style="width: 50px;height: 50px;"></td>
+											<td>{{ assignment.user.name }}</td>
+											<td>
+												<input type="number" min="0" max="{{ form.quota }}" class="form-control" ng-model="assignment.quota" ng-disabled="form.allow_new_submissions == false" ng-blur="updateAssignmentQuota(assignment)" integer>
+											</td>
+											<td>
+												<input type="text" value="{{ assignment.moderator.name }}" class="form-control changeMod">
+											</td>
+											<td>
+												<a href="" ng-click="deleteAssignment(assignment)"><span class="glyphicon glyphicon-remove"></span></a>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+								<div class="clearfix"></div>
+							</div>
+
+							<div class="clearfix"></div>
+
+							<a class="btn btn-info" ng-click="prevPage()">Anterior</a>
+							<a class="btn btn-info pull-right" ng-click="nextPage()">Próximo</a>
+
+							<div class="clearfix"></div>
+						</div>
+
+						<!-- form making -->
+						<div id="page_four" ng-show="current_page == 'page_four'">
+							<div class="scroller_anchor"></div>
+							<div class="inputs_options">
+								<a class="btn btn-default pull-right" ng-click="addSection()">Adicionar paginação</a>
+
+								<ul class="nav nav-tabs">
+									<li ng-repeat="tab in tabs" ng-class="{active: tabs[current_tab] == tab}" >
+										<a ng-click="changeTab(tab)" href="">{{ tab }}</a>
+									</li>
+								</ul>
+
+								<div class="inputs_list" ng-repeat="tab in tabs" ng-show="tabs[current_tab] == tab">
+									
+									<div class="item" ng-repeat="item in tab_items[current_tab]" name="{{ item.type }}" item-draggable>{{ item.type | formTypeName }}</div>
+
+									<div class="clearfix"></div>
+								</div>
+							</div>
+
+							<ul class="pages" id="sortable_pages">
+								<li class="page" ng-repeat="section in form.sections | orderBy:'order'" id="page_{{ form.sections.indexOf(section) }}">
+									<h1 ng-hide="section.showSectionTitleInput" ng-click="toggleEditSectionTitle(section)">{{ section.name }}</h1>
+									<form ng-show="section.showSectionTitleInput" class="edit_title" style="width: 90%" >
+										<input type="text" placeholder="{{ section.name }}" ng-model="section.name" focus-me="section.focusEditSectionTitle" ng-blur="toggleEditSectionTitle(section)" style="width: 100%" />
+									</form>
+
+									<div class="drag">
+										<span class="glyphicon glyphicon-resize-vertical"></span>
+									</div>
+
+									<div class="delete" ng-click="deleteSection(section)">
+										<span class="glyphicon glyphicon-trash"></span>
+									</div>
+
+									<div class="clearfix"></div>
+
+									<div class="content" item-droppable="page">
+										<ol class="list-items">
+											<li ng-repeat="field in section.fields | orderBy:'order'" id="item_{{ section.fields.indexOf(field) }}" input-item ng-class="{hide: field.read_only == true}">
+												<div class="number"></div>
+
+												<div class="li-content" ng-class="{label_field: field.type == 'LabelField'}">
+													{{ field.label }}
+												</div>
+
+												<div class="li-actions">
+													<a class="pull-right" href="" ng-click="deleteItem(field)" rel="tooltip" data-toggle="tooltip" title="Remover"><span class="glyphicon glyphicon-remove"></span></a>
+													<a class="pull-right" href="" style="margin-right: 5px;" ng-click="copyItem(field)" rel="tooltip" data-toggle="tooltip" title="Duplicar"><span class="glyphicon glyphicon-new-window"></span></a>
+												</div>
+
+												<div class="clearfix"></div>
+
+												<!-- Show options modal -->
+												<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+													<div class="modal-dialog">
+														<div class="modal-content">
+															<div class="modal-header">
+																<button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="updateItem()">&times;</button>
+																<h4 class="modal-title">Adicionar campos para <span ng-bind="field.label"></span></h4>
+															</div>
+
+															<div class="modal-body" ng-hide="hide_editing_options">
+																
+																<div class="form-inline pull-right" style="margin-bottom: 10px;">
+																	<div class="form-group">
+																		<select class="form-control" ng-model="selected_inject_option">
+																			<option value="none" selected> -- Selecionar modelo pré-definido -- </option>
+																			<option value="br_states">Estados brasileiros</option>
+																		</select>
+																	</div>
+
+																	<a class="btn btn-primary" ng-click="injectOptions()">Inserir</a>
+																</div>
+
+																<div class="clearfix"></div>
+
+																<div class="well" ng-show="field.options.length">
+																	<ul class="options_sortable" style="padding: 0px;">
+																		<li class="btn-group btn-block option_item" style="margin: 3px;" ng-repeat="value in field.options" id="option_{{ field.options.indexOf(value) }}">
+																			<div class="btn btn-default"><span class="glyphicon glyphicon-move"></span></div>
+																			<button type="button" class="btn btn-default" ng-bind="value.label"></button>
+																			<button type="button" class="btn btn-default" ng-click="editOption(value)">
+																				<span class="glyphicon glyphicon-pencil"></span>
+																			</button>
+																			<button type="button" class="btn btn-default" ng-click="deleteOption(value)">
+																				<span class="glyphicon glyphicon-remove"></span>
+																			</button>
+																		</li>
+																	</ul>
+																</div>
+
+																<form ng-submit="addOption()">
+																	<div class="input-group">
+																		<input type="text" class="form-control" ng-model="valueName" required>
+																		<span class="input-group-btn">
+																			<button class="btn btn-info" type="submit">Adicionar</button>
+																		</span>
+																	</div>
+																</form>
+
+																<a class="btn btn-primary btn-block" ng-click="hide_editing_options = true" style="margin-top: 10px;">Editar lógicas disponíveis</a>
+															</div>
+
+															<div class="modal-body" ng-show="hide_editing_options">
+																<a class="btn btn-success pull-right" ng-click="hide_editing_options = false">Retornar para a lista</a>
+
+																<h3 class="pull-left" style="margin: 0px;">Adicionar nova lógica</h3>
+
+																<div class="clearfix"></div>
+
+																<div class="form-group">
+																	<label>Selecione as opções</label>
+
+																	<select multiple class="form-control" ng-options="obj.value as obj.label for obj in field.options" ng-model="action_selected_options">
+
+																	</select>
+																</div>
+
+																<div class="form-group">
+																	<label>Selecione os campos para serem desativados ao selecionar os campos acima</label>
+
+																	<select multiple class="form-control" ng-options="obj.id as obj.label for obj in available_fields | hideExtraData" ng-model="action_selected_disable_fields">
+
+																	</select>
+																</div>
+
+																<a class="btn btn-primary pull-right" ng-click="addAction()">Adicionar lógica</a>
+
+																<div class="clearfix"></div>
+
+																<div ng-show="field.actions.length">
+																	<h3>Lógicas cadastradas</h3>
+
+																	<p>Quando o usuário selecionar os valores abaixo, as ações marcadas serão efetuadas.</p>
+
+																	<p> Legenda: <span class="label label-success">Ativar</span> <span class="label label-danger">Desativar</span></p>
+
+																	<br />
+																</div>
+
+																<div ng-repeat="action in field.actions">
+																	<div class="panel panel-default">
+																		<div class="panel-heading">
+																			<h3 class="panel-title">Lógica #{{ field.actions.indexOf(action) + 1 }} <span ng-click="removeAction(action)" style="cursor:pointer;" class="glyphicon glyphicon-remove pull-right"></h3>
+																		</div>
+
+																		<div class="panel-body">
+																			<p class="pull-left" ng-repeat="field in action.enable">
+																				<span class="label label-success">{{ getFieldLabelById(field) }}</span>
+																			</p>
+
+																			<div class="clearfix"></div>
+
+																			<p class="pull-left" ng-repeat="field in action.disable">
+																				<span class="label label-danger">{{ getFieldLabelById(field) }}</span>
+																			</p>
+
+																			<div class="clearfix"></div>
+
+																			<ul class="list-group">
+																				<li class="list-group-item" style="margin-bottom: 0px;" ng-repeat="option in action.when">{{ option }}</li>
+																			</ul>
+																		</div>
+																	</div>
+																</div>
+															</div>
+
+															<div class="modal-footer">
+																<button type="button" ng-click="updateItem()" class="btn btn-default" data-dismiss="modal">Fechar</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</li>
+										</ol>
+									</div>
+								</li>
+							</ul>
+
+							<!-- Template for popover -->
+							<div id="input_popover_template_title" style="display: none;">
+								Editar campo <span ng-bind="field.label | cut:false:15"></span> {{ field.label }} <span ng-click="closePopover()" style="cursor:pointer;" class="glyphicon glyphicon-remove pull-right"></span>
+							</div>
+							
+							<div id="input_popover_template" style="display: none;">
+								<div class="form-group">
+									<label>Nome do campo</label>
+									<input type="text" class="form-control" ng-model="field.label"/>
+								</div>
+
+								<div class="form-group">
+									<label>Descrição</label>
+									<textarea type="text" class="form-control" ng-model="field.description" /></textarea>
+								</div>
+
+								<div class="form-group">
+									<label>Tipo de campo</label>
+									<div ng-bind="field.type | formTypeName"></div>
+								</div>
+
+								<div class="form-group">
+									<label>Opções</label>
+
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" ng-model="required" ng-change="toggleRequired()"> Requerido
+										</label>
+									</div>
+
+									<div class="checkbox">
+										<label>
+											<input type="checkbox" ng-model="identifier" ng-change="toggleIdentifier()"> Identificador
+										</label>
+									</div>
+
+									<div class="checkbox" ng-show="field.type | showOptionsBtn">
+										<label>
+											<input type="checkbox" ng-model="hasOther" ng-change="toggleHasOther()"> Ativar opção "outros"
+										</label>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label>Tipo de layout</label>
+									<select ng-model="field.layout" class="form-control" ng-options="obj.type as obj.name for obj in available_layouts">
+										<option value="">-- escolha um layout --</option>
+									</select>
+								</div>
+
+								<div class="btn btn-primary btn-block" ng-show="field.type | showOptionsBtn" ng-click="showAddOptions()">Adicionar opções</div>
+							</div>
+
+							<div class="clearfix"></div>
+
+							<a class="btn btn-info" ng-click="prevPage()">Anterior</a>
+							<a class="btn btn-info pull-right" ng-click="nextPage()">Próximo</a>
+
+							<div class="clearfix"></div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" id="csv_instructions">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+							<h4 class="modal-title">Formulário pré-cadastrado</h4>
+						</div>
+
+						<div class="modal-body">
+<p>Você pode importar um arquivo CSV contendo uma lista de informações já preenchidas que será utilizada como base para os formulários a serem preenchidos. Caso você selecione este modo os seguintes recursos ficarão disponíveis:</p>
+
+<h4>1. Substituir uma pesquisa automaticamente por outra previamente cadastrado</h4><br />
+<p>Você pode montar uma coluna em seu arquivo CSV contendo um valor único para cada "conjunto de pesquisas", ou seja, quando um pesquisador cancela o envio de um formulário (por algum motivo) ele poderá ser apresentado com uma nova pesquisa  automaticamente, basta você agrupar quais Pesquisas tem relação uma com a outra.</p>
+
+<h5>Exemplo:</h5>
+<p>No modelo de CSV que você pode fazer download, existe uma coluna chamada  "Agrupamento para substituição da pesquisa" com uma numeração. Neste exemplo foi agrupado a linha 2 e a linha 3 como uma pesquisa, isto é, o sistema irá importar todas as linhas, mas só exibirá a primeira pesquisa do agrupamento. Neste caso, existem 3 grupos:</p>
+
+<blockquote>Grupo 1 - Possui duas pesquisas<br />
+Grupo 2 - Possui três pesquisas<br />
+Grupo 3 - Possui 1 pesquisa<br /></blockquote>
+
+<p>Quando o pesquisador Nathan (entrevistador que esta como um exemplo no CSV) entrar no aplicativo, ele verá apenas a linha 2 do CSV. Se por algum motivo ele cancelar a pesquisa, o aplicativo automaticamente enviará a pesquisa da linha 3, fazendo a substituição para o pesquisador Nathan.</p>
+
+<p>O mesmo serve para a próxima pesquisa. Quando o pesquisador Gabriel (entrevistador que esta como um exemplo no CSV) entrar no aplicativo, ele encontrará apenas a linha 4 disponível, entretanto, se por algum motivo ele cancelar a pesquisa, automaticamente a pesquisa da linha 5 ficará disponível e, novamente, se ele cancelar, a pesquisa da linha 6 ficará disponível.</p>
+
+<h4>2. Atribuindo um título para cada Pesquisa (obrigatório)</h4>
+<p>Você pode selecionar um campo, dentro do seu arquivo CSV, que será exibido como título nas Pesquisas. Por exemplo: Se o seu arquivo CSV tem um campo de endereço ou um campo com um nome das pessoas, ao selecionar, esta informação será exibida na listagem de Pesquisas que deverão ser realizadas.</p>
+
+<h5>Exemplo:</h5>
+<p>No exemplo do CSV disponível para download, você poderá colocar o endereço do entrevistado como o título da pesquisa, dessa forma quando o pesquisador fizer o login no tablet e clicar no botão "Nova Pesquisa" o app exibirá a listagem de endereços para que o agente pesquisador selecione qual a pesquisa que ele deseja iniciar.</p>
+
+<h4>3. Vincular pesquisas à um agente pesquisador (obrigatório)</h4>
+<p>Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Integer posuere erat a ante venenatis dapibus posuere velit aliquet. Maecenas faucibus mollis interdum. Cras mattis consectetur purus sit amet fermentum.</p>
+
+<h5>Exemplo:</h5>
+<p>No exemplo do CSV disponível para download, existe uma coluna chamada "Pesquisadorque deverá receber a pesquisa". Esta coluna é responsável em dizer ao sistema para qual agente pesquisador a pesquisa será atribuído automaticamente. Basta colocar o login do usuário.</p>
+
+<h4>4. Informações extras</h4>
+<p>Você pode escolher um ou mais campos que serão exibidos dentro da pesquisa, isto pode ser útil para você apresentar um conjunto de informações que irá auxiliar o seu Pesquisador.</p>
+
+<h5>Exemplo</h5>
+<p>Você pode ter quantas colunas forem necessárias para exibir informações úteis ao seus agentes. No exemplo do CSV, foi inserido as colunas:
+<ul>
+	<li>Nome do Entrevistado</li>
+	<li>Complemento do Endereço</li>
+	<li>Observação</li>
+</ul>
+<p>Estas colunas serão exibidas no aplicativo como informação extra para auxiliar o agente</p>
+
+<h4>5. Amostra de exemplo</h4><br />
+<p>Você poderá fazer download de um arquivo CSV de exemplo. Neste arquivo contém as colunas que foram usadas para testes. Lembre-se que o seu CSV pode ter qualquer nome de coluna/cabeçalho e qualquer informação, basta você atribuir corretamente quais informações que vc deseja usar como título (se for necessário), agrupamento para substituição da pesquisa (se for necessário), atribuição de pesquisas e informações extras.</p>
+
+<p><a type="button" class="btn btn-success btn-xs" href="amostra-exemplo.csv" target="_blank">Baixe aqui o arquivo CSV como uma amostra/exemplo.</a></p>
+						</div>
+
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+						</div>
+					</div>
+				</div>
+			</div>

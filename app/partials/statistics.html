@@ -1,0 +1,80 @@
+				<div class="box stats dashboard">
+					<span class="title">Estatísticas {{ title }}</span>
+
+					<div class="content">
+						
+						<div class="out">
+							<div class="charts">
+
+								<div class="chart approved">
+									<p>aprovados</p>
+
+									<div class="inner">
+										<span>{{ approved }}</span>
+									</div>
+								</div>
+
+								<div class="chart waiting_approval">
+									<p>aguardando aprovação</p>
+
+									<div class="inner">
+										<span>{{ waiting_approval }}</span>
+									</div>
+								</div>
+
+								<div class="chart waiting_correction">
+									<p>aguardando correção</p>
+
+									<div class="inner">
+										<span>{{ waiting_correction }}</span>
+									</div>
+								</div>
+
+
+								<div class="chart reschdule">
+									<p>reagendado</p>
+
+									<div class="inner">
+										<span>{{ rescheduled }}</span>
+									</div>
+								</div>
+
+								<div class="chart canceled">
+									<p>cancelado</p>
+
+									<div class="inner">
+										<span>{{ canceled }}</span>
+									</div>
+								</div>
+
+								<div class="clearfix"></div>
+
+								<div class="columns">
+									<div class="first_column">
+										<div ng-repeat="info in infos">
+											<div class="stripe {{ available_colors[info.color] }}"></div>
+										</div>
+									</div>
+
+									<div class="second_column">
+										<div ng-repeat="info in infos">
+											<div class="stripe {{ available_colors[info.color] }}"></div>
+										</div>
+									</div>
+
+									<div class="third_column">
+										<div ng-repeat="info in infos">
+											<div class="stripe {{ available_colors[info.color] }}"><p><span>{{ info.count }}</span> {{ info.name }}</p></div>
+
+											<div class="arrow {{ available_colors[info.color] }}"></div>
+											<div class="clearfix"></div>
+										</div>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+						<div class="clearfix"></div>
+					</div>
+				</div>
