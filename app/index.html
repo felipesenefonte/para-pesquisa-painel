@@ -11,8 +11,13 @@
 		<link href="bower_components/jquery-ui/themes/smoothness/jquery-ui.css" rel="stylesheet" />
 
 		<script type="text/javascript">
-			var api_info = {url: '/', version: '1'};
-		</script>
+            var api_info = {url: undefined, port: '8085', version: '1'};
+
+            if(!api_info.url) {
+                var port = api_info.port ? ':' + api_info.port : (window.location.port ? (':' + window.location.port) : '');
+                api_info.url = window.location.protocol + '//' + window.location.hostname + port;
+            }
+        </script>
 
 		<script src="bower_components/jquery/jquery.min.js"></script>
 		<script src="bower_components/jquery-ui/ui/jquery-ui.js"></script>
